@@ -1,0 +1,27 @@
+[global]
+uid = {{ rsync_user }}
+gid = {{ rsync_group }}
+use chroot = {{ rsync_chroot }}
+max connections = {{ rsync_maxconn }}
+timeout = {{ rsync_timeout }}
+port = {{ rsync_port }}
+log file = /var/log/rsyncd.log
+ignore errors
+
+{% for share in rsync_shares %}
+[{{ share.name }}]
+path = {{ share.path }}
+comment = {{ share.comment | default(share.path) }}
+read only = {{ share.readonly | default(False) | ternary('true', 'false' ) }}
+list = {{ share.list | default(False) | ternary('true', 'false' ) }}
+hosts allow = {{ ansible_default_ipv4.network }}/{{ ansible_default_ipv4.netmask }}
+hosts deny = 0.0.0.0/32
+{% if share.excludes is defined %}
+exclude = {{ share.excludes | default(['lost+found', '.*']) | join(' ') }}
+{% endif %}
+{% if share.authuser is defined %}
+auth users = {{ share.authuser }}
+secrets file = {{ rsync_passfile }}
+{% endif %}
+
+{% endfor %}

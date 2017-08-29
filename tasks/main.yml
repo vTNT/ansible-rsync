@@ -1,0 +1,41 @@
+---
+
+- name: Install Debian OS packages
+  apt: pkg={{ item }} state=present update_cache=yes cache_valid_time=3600
+  with_items:
+    - xinetd
+    - rsync
+
+- name: Check if sersync directory exists
+  stat: path=/etc/xinetd.d
+  register: systemd_check
+
+- name: create xinetd conf file.
+  template:
+    dest: /etc/xinetd.conf
+    mode: 0644
+    src: xinetd.conf.j2
+
+- name: create xinetd rsync file.
+  template:
+    dest: /etc/xinetd.d/rsync
+    mode: 0644
+    src: rsync.j2
+  when: systemd_check
+
+- name: configure | Setup rsyncd.password file.
+  template:
+    dest: "{{ rsync_passfile }}"
+    mode: 0600
+    src: rsyncd.password.j2
+  when: rsync_authusers
+
+- name: configure | Setup rsyncd.conf file.
+  template:
+    dest: "{{ rsync_conf }}"
+    mode: 0644
+    src: rsyncd.conf.j2
+  notify: restart xinetd
+
+- name: Enable/Disable xinetd service
+  service: name=xinetd state=started enabled=yes

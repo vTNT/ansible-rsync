@@ -1,0 +1,10 @@
+service rsync
+{
+        disable         = no
+        wait            = no
+        socket_type     = stream
+        user            = root
+        server          = /usr/bin/rsync
+        server_args     = --daemon
+        log_on_failure += USERID
+}
