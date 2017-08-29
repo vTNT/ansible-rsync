@@ -1,62 +1,51 @@
 # Ansible Role: rsync
 
-安装rsync服务
-
-## 介绍
+## info
 rsync是类unix系统下的数据镜像备份工具——remote sync。一款快速增量备份工具 Remote Sync，远程同步 支持本地复制，或者与其他SSH、rsync主机同步。
 
 官方地址： http://rsync.samba.org/
 官方文档地址：http://rsync.samba.org/documentation.html
 
-## 要求
+## os env
 
-此角色仅在RHEL及其衍生产品上运行。
+ansible `2.x`
+os `ubuntu 14.04`
 
-## 测试环境
+## var
+	xinetd_ip: "{{ ansible_default_ipv4.address }}" #"{{ ansible_eth0.ipv4.address }}"
 
-ansible `2.2.1.0`
-os `Centos 6.7 X64`
+    rsync_user: "root"
+    rsync_group: "root"
+    rsync_conf: "/etc/rsyncd.conf"
 
-## 角色变量
-	rsync_user: "rsync"
-	rsync_logdir: "/var/log/rsyncd"
-	rsync_conf: "/etc/rsyncd.conf"
+    rsync_authusers: [] # ["test:123456"]
+    rsync_passfile: "/etc/rsyncd.password"
 
-	rsync_authusers: [] # ["test:123456"]
-	rsync_passfile: "/etc/rsyncd.password"
+    rsync_port: 873
+    rsync_maxconn: 200
+    rsync_timeout: 300
+    rsync_chroot: no
+    rsync_shares: {} #{"name": "test", "path": "/data"}
 
-	rsync_port: 873
-	rsync_maxconn: 200
-	rsync_timeout: 300
-	rsync_chroot: no
-	rsync_shares: {}
-
-	ansible_python_interpreter: /usr/bin/python2.6
-
-## 依赖
-
-
-## github地址
-https://github.com/kuailemy123/Ansible-roles/tree/master/rsync
+## require
+xinetd
 
 ## Example Playbook
 
-	- hosts: node1
-	  roles:
-	  - role: rsync
-		rsync_authusers: ["t1:123456","t2:1234567"]
-		rsync_shares:
-			- name: data1
-			  comment: Public data1
-			  path: /data/1
-			  authuser: t1
-			  passfile: /etc/rsyncd.password
-			  readonly: false
-			  list: false
-			  excludes: ["test.txt","*.h"]
-			- name: data2
+	---
+    - name: Test the plabybook API.
+      hosts: all
+      remote_user: root
+      gather_facts: yes
+      roles:
+        - role: ansible-rsync
+          rsync_authusers: ["nobody:123456"]
+          xinetd_ip: "{{ ansible_eth0.ipv4.address }}"
+          rsync_shares:
+            - name : stock
+              "path": "/data/LOneClient/data"
+              "comment": "stock"
+              "authuser": "nobody"
+		    - name: data2
 			  comment: Public data2
 			  path: /data/2
-
-## 使用
-启动 rsync --daemon --config=/etc/rsyncd.conf
