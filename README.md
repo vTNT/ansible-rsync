@@ -46,6 +46,6 @@ xinetd
               "path": "/data/LOneClient/data"
               "comment": "stock"
               "authuser": "nobody"
-		    - name: data2
-			  comment: Public data2
-			  path: /data/2
+            - name: data2
+	      "comment": "Public data2"
+	      "path": ""/data/2"
