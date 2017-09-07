@@ -6,6 +6,9 @@
     - xinetd
     - rsync
 
+- name: edit /etc/default/rsync
+  lineinfile: dest=/etc/default/rsync regexp=^RSYNC_ENABLE line="RSYNC_ENABLE=inetd"
+
 - name: Check if sersync directory exists
   stat: path=/etc/xinetd.d
   register: systemd_check
