@@ -32,7 +32,7 @@ xinetd
 
 ## Example Playbook
 
-	---
+    ---
     - name: Test the plabybook API.
       hosts: all
       remote_user: root

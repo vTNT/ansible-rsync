@@ -33,6 +33,12 @@
     src: rsyncd.password.j2
   when: rsync_authusers
 
+- name: configure | Create rsync data Directory.
+  file: path={{ item.path }} state=directory
+  with_items:
+    - "{{ rsync_shares }}"
+  when: rsync_shares
+
 - name: configure | Setup rsyncd.conf file.
   template:
     dest: "{{ rsync_conf }}"
